@@ -3,19 +3,24 @@
 from __future__ import annotations
 
 import hashlib
+import hmac
 import os
 import re
 import sqlite3
 import time
+from collections import defaultdict
 from contextlib import contextmanager
 from datetime import date
 from pathlib import Path
+from threading import Lock
 from typing import Iterator
 from urllib.parse import unquote, urlparse
 
 from fastapi import FastAPI, Header, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
+from starlette.middleware.base import BaseHTTPMiddleware
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_DIR = Path(os.environ.get("STAT_DATA_DIR", BASE_DIR / "data"))
@@ -26,6 +31,15 @@ DEBOUNCE_SECONDS = int(os.environ.get("STAT_DEBOUNCE_SECONDS", "0"))
 
 # Required to access GET /api/stat/pages. Empty = endpoint disabled (404).
 PAGES_TOKEN = (os.environ.get("STAT_PAGES_TOKEN") or "").strip()
+
+# Per-IP rate limit for mutating requests (POST). 0 = disabled.
+RATE_LIMIT_WINDOW = int(os.environ.get("STAT_RATE_LIMIT_WINDOW", "60"))
+RATE_LIMIT_MAX = int(os.environ.get("STAT_RATE_LIMIT_MAX", "120"))
+
+# Max JSON body size for POST (bytes).
+MAX_BODY_BYTES = int(os.environ.get("STAT_MAX_BODY_BYTES", "4096"))
+
+MAX_PATH_LEN = 512
 
 ALLOWED_ORIGINS = [
     o.strip()
@@ -41,7 +55,10 @@ ALLOWED_ORIGINS = [
 ]
 
 BOT_UA = re.compile(
-    r"(bot|spider|crawl|slurp|bingpreview|facebookexternalhit|wget|curl|python-requests)",
+    r"(bot|spider|crawl|slurp|bingpreview|facebookexternalhit|wget|curl|"
+    r"python-requests|scrapy|httpclient|java/|go-http|okhttp|libwww|"
+    r"phantomjs|headlesschrome|selenium|puppeteer|playwright|"
+    r"axios/|node-fetch|httpie|aiohttp|undici|feedfetcher|preview)",
     re.I,
 )
 
@@ -51,7 +68,15 @@ FILE_EXT_RE = re.compile(
     re.I,
 )
 
-app = FastAPI(title="blog-stat", docs_url=None, redoc_url=None)
+# Control chars (incl. NUL) and other unsafe path markers.
+_CONTROL_RE = re.compile(r"[\x00-\x1f\x7f]")
+
+app = FastAPI(
+    title="blog-stat",
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
+)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
@@ -59,9 +84,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+_rate_lock = Lock()
+_rate_hits: dict[str, list[float]] = defaultdict(list)
+
 
 class StatPayload(BaseModel):
-    path: str = Field(default="/", max_length=512)
+    path: str = Field(default="/", max_length=MAX_PATH_LEN)
+
+
+class LimitBodySizeMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        if request.method in ("POST", "PUT", "PATCH"):
+            cl = request.headers.get("content-length")
+            if cl is not None:
+                try:
+                    size = int(cl)
+                except ValueError:
+                    return JSONResponse({"detail": "Invalid Content-Length"}, status_code=400)
+                if size > MAX_BODY_BYTES:
+                    return JSONResponse({"detail": "Payload too large"}, status_code=413)
+        return await call_next(request)
+
+
+app.add_middleware(LimitBodySizeMiddleware)
 
 
 def _ensure_db() -> None:
@@ -120,15 +165,68 @@ def _visitor_id(ip: str) -> str:
     return hashlib.sha256(f"{ip}|{date.today().isoformat()}".encode()).hexdigest()[:32]
 
 
+def _rate_limited(ip: str) -> bool:
+    """Return True if this IP exceeded the POST rate budget."""
+    if RATE_LIMIT_MAX <= 0 or RATE_LIMIT_WINDOW <= 0:
+        return False
+    now = time.time()
+    cutoff = now - RATE_LIMIT_WINDOW
+    with _rate_lock:
+        hits = _rate_hits[ip]
+        hits = [t for t in hits if t > cutoff]
+        if len(hits) >= RATE_LIMIT_MAX:
+            _rate_hits[ip] = hits
+            return True
+        hits.append(now)
+        _rate_hits[ip] = hits
+        # Bound memory: drop idle keys occasionally.
+        if len(_rate_hits) > 10000:
+            stale = [k for k, v in _rate_hits.items() if not v or v[-1] < cutoff]
+            for k in stale[:5000]:
+                _rate_hits.pop(k, None)
+        return False
+
+
+def _is_safe_path_candidate(raw: str) -> bool:
+    if not raw or len(raw) > MAX_PATH_LEN:
+        return False
+    if _CONTROL_RE.search(raw):
+        return False
+    if "\\" in raw:
+        return False
+    # Reject "." / ".." as path segments (traversal / noise).
+    for seg in raw.replace("\\", "/").split("/"):
+        if seg in (".", ".."):
+            return False
+    return True
+
+
 def _normalize_path(path: str) -> str:
-    """Canonical page key: decode, strip index.html, unify trailing slash for dirs."""
+    """Canonical page key: decode, strip index.html, unify trailing slash for dirs.
+
+    Rejects traversal, backslashes, control characters, and overlong paths.
+    """
     path = (path or "/").strip() or "/"
+    if not _is_safe_path_candidate(path):
+        raise HTTPException(status_code=400, detail="Invalid path")
+
     if path.startswith("http://") or path.startswith("https://"):
         path = urlparse(path).path or "/"
+        if not _is_safe_path_candidate(path):
+            raise HTTPException(status_code=400, detail="Invalid path")
+
     path = unquote(path)
+    if not _is_safe_path_candidate(path):
+        raise HTTPException(status_code=400, detail="Invalid path")
+
+    path = path.split("?", 1)[0].split("#", 1)[0]
     if not path.startswith("/"):
         path = "/" + path
-    path = path.split("?", 1)[0].split("#", 1)[0]
+
+    parts = [p for p in path.split("/") if p]
+    if any(p in (".", "..") for p in parts):
+        raise HTTPException(status_code=400, detail="Invalid path")
+    path = "/" + "/".join(parts) if parts else "/"
 
     lower = path.lower()
     if lower.endswith("/index.html"):
@@ -139,8 +237,8 @@ def _normalize_path(path: str) -> str:
     if path != "/" and not path.endswith("/") and not FILE_EXT_RE.search(path):
         path += "/"
 
-    if len(path) > 512:
-        path = path[:512]
+    if len(path) > MAX_PATH_LEN:
+        raise HTTPException(status_code=400, detail="Invalid path")
     return path or "/"
 
 
@@ -161,7 +259,20 @@ def _path_aliases(path: str) -> list[str]:
 
 def _is_bot(request: Request) -> bool:
     ua = request.headers.get("user-agent") or ""
+    if not ua.strip():
+        # Empty UA is common for scrapers; treat as bot for write path.
+        return True
     return bool(BOT_UA.search(ua))
+
+
+def _token_matches(provided: str) -> bool:
+    """Constant-time compare against STAT_PAGES_TOKEN. Never log the token."""
+    if not PAGES_TOKEN:
+        return False
+    # Hash to fixed length so compare_digest never raises on length mismatch.
+    a = hashlib.sha256(provided.encode("utf-8")).digest()
+    b = hashlib.sha256(PAGES_TOKEN.encode("utf-8")).digest()
+    return hmac.compare_digest(a, b)
 
 
 def _get_page_pv(conn: sqlite3.Connection, path: str) -> int:
@@ -230,11 +341,14 @@ def list_pages(
     x_stat_token: str | None = Header(default=None, alias="X-Stat-Token"),
     token: str | None = Query(default=None),
 ) -> dict:
-    """List per-page PV. Disabled unless STAT_PAGES_TOKEN is set and matches."""
+    """List per-page PV. Disabled unless STAT_PAGES_TOKEN is set and matches.
+
+    Missing/wrong token always returns 404 (no oracle). Token is never logged.
+    """
     if not PAGES_TOKEN:
         raise HTTPException(status_code=404, detail="Not Found")
     provided = (x_stat_token or token or "").strip()
-    if provided != PAGES_TOKEN:
+    if not _token_matches(provided):
         raise HTTPException(status_code=404, detail="Not Found")
     with _connect() as conn:
         rows = conn.execute(
@@ -263,6 +377,9 @@ def post_stat(payload: StatPayload, request: Request) -> dict:
             return _read_counts(conn, path)
 
     ip = _client_ip(request)
+    if _rate_limited(ip):
+        raise HTTPException(status_code=429, detail="Too Many Requests")
+
     visitor = _visitor_id(ip)
     now = time.time()
     day = date.today().isoformat()

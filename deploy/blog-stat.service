@@ -1,0 +1,25 @@
+[Unit]
+Description=blog-stat FastAPI (localhost only; nginx reverse-proxies /api/)
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/blog-stat
+Environment=STAT_DATA_DIR=/opt/blog-stat/data
+# Environment=STAT_PAGES_TOKEN=replace-with-a-long-random-secret
+# Environment=STAT_CORS_ORIGINS=https://www.xssl.online,https://xssl.online,https://82488059.github.io
+# Environment=STAT_RATE_LIMIT_MAX=120
+ExecStart=/opt/blog-stat/.venv/bin/python -m uvicorn app:app --host 127.0.0.1 --port 3001
+Restart=on-failure
+RestartSec=3
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/blog-stat/data
+
+[Install]
+WantedBy=multi-user.target

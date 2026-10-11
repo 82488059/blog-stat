@@ -1,4 +1,4 @@
-﻿.venv/
+.venv/
 __pycache__/
 *.py[cod]
 *$py.class
@@ -14,6 +14,8 @@ __pycache__/
 *~
 .DS_Store
 Thumbs.db
+*.db
+*.db-*
 data/stats.db
 data/*.db
 data/*.db-*
