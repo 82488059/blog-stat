@@ -1,0 +1,67 @@
+{
+  "stats": {
+    "posts": 366,
+    "images_total": 285,
+    "relative": 6,
+    "absolute_ok": 255,
+    "absolute_missing": 0,
+    "external": 24,
+    "data_uri": 0,
+    "empty": 0
+  },
+  "relative": [
+    {
+      "file": "source/_posts/deploy/2019-11-08-csdn-markdown-help.md",
+      "url": "[mermaid语法说明](https://mermaidjs.github.io/)",
+      "exists_nearby": false,
+      "nearby": []
+    },
+    {
+      "file": "source/_posts/deploy/2019-11-08-markdown.md",
+      "url": "图片地址",
+      "exists_nearby": false,
+      "nearby": []
+    },
+    {
+      "file": "source/_posts/deploy/2019-11-08-markdown.md",
+      "url": "图片地址",
+      "exists_nearby": false,
+      "nearby": []
+    },
+    {
+      "file": "source/_posts/deploy/2019-11-08-markdown语法说明.md",
+      "url": "图片地址",
+      "exists_nearby": false,
+      "nearby": []
+    },
+    {
+      "file": "source/_posts/deploy/2019-11-08-markdown语法说明.md",
+      "url": "图片地址",
+      "exists_nearby": false,
+      "nearby": []
+    },
+    {
+      "file": "source/_posts/deploy/2019-11-08-markdown语法说明.md",
+      "url": "xssl.online/picture/src/old/20191108155002301.jpg",
+      "exists_nearby": false,
+      "nearby": []
+    }
+  ],
+  "absolute_missing": [],
+  "external_hosts": {
+    "imgconvert.csdnimg.cn": 2,
+    "meta.math.stackexchange.com": 1,
+    "mermaidjs.github.io": 2,
+    "adrai.github.io": 1,
+    "82488059.github.io": 2,
+    "google.com": 4,
+    "search.yahoo.com": 4,
+    "search.msn.com": 4,
+    "www.google.com": 4
+  },
+  "problem_posts": [
+    "source/_posts/deploy/2019-11-08-csdn-markdown-help.md",
+    "source/_posts/deploy/2019-11-08-markdown.md",
+    "source/_posts/deploy/2019-11-08-markdown语法说明.md"
+  ]
+}

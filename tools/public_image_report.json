@@ -1,0 +1,120 @@
+{
+  "stats": {
+    "images": 5964,
+    "abs_ok": 5568,
+    "external_or_data": 371,
+    "abs_missing": 25
+  },
+  "relative": [],
+  "absolute_missing": [
+    {
+      "page": "/20191125/deploy/2019-11-25-视频转码后播放分辨率与转码分辨率不同/",
+      "src": "/picture/src/old/20191125145729139.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3g4MjQ4ODA1OQ==,size_16,color_FFFFFF,t_70"
+    },
+    {
+      "page": "/20200819/deploy/2020-08-19-Windows编译FreeRDP/",
+      "src": "/picture/src/old/20200819144749276.png#pic_center"
+    },
+    {
+      "page": "/20200819/deploy/2020-08-19-Windows编译FreeRDP/",
+      "src": "/picture/src/old/20200819153437536.png#pic_center"
+    },
+    {
+      "page": "/20200819/deploy/2020-08-19-Windows编译FreeRDP/",
+      "src": "/picture/src/old/20200819153022905.png#pic_center"
+    },
+    {
+      "page": "/20200819/deploy/2020-08-19-Windows编译FreeRDP/",
+      "src": "/picture/src/old/20200819144644160.png#pic_center"
+    },
+    {
+      "page": "/20200819/deploy/2020-08-19-Windows编译FreeRDP/",
+      "src": "/picture/src/old/20200819144705254.png#pic_center"
+    },
+    {
+      "page": "/20200819/deploy/2020-08-19-Windows编译FreeRDP/",
+      "src": "/picture/src/old/20200819141858678.png#pic_center"
+    },
+    {
+      "page": "/20200819/deploy/2020-08-19-Windows编译FreeRDP/",
+      "src": "/picture/src/old/20200819143510240.png#pic_center"
+    },
+    {
+      "page": "/20200819/deploy/2020-08-19-Windows编译FreeRDP/",
+      "src": "/picture/src/old/2020081914363256.png#pic_center"
+    },
+    {
+      "page": "/20200819/deploy/2020-08-19-Windows编译FreeRDP/",
+      "src": "/picture/src/old/20200819143005835.png#pic_center"
+    },
+    {
+      "page": "/20200819/deploy/2020-08-19-Windows编译FreeRDP/",
+      "src": "/picture/src/old/20200819143722433.png#pic_center"
+    },
+    {
+      "page": "/20200819/deploy/2020-08-19-Windows编译FreeRDP/",
+      "src": "/picture/src/old/20200819144210587.png#pic_center"
+    },
+    {
+      "page": "/20200819/deploy/2020-08-19-Windows编译FreeRDP/",
+      "src": "/picture/src/old/20200819151209531.png#pic_center"
+    },
+    {
+      "page": "/20210407/deploy/2021-04-07-迷宫生成算法(Aldous-Broder_algorithm)/",
+      "src": "/picture/src/old/20210407163139686.gif#pic_center"
+    },
+    {
+      "page": "/20210414/deploy/2021-04-14-迷宫寻路算法(深度优先搜索)/",
+      "src": "/picture/src/old/20210414132217760.gif#pic_center"
+    },
+    {
+      "page": "/20210426/deploy/2021-04-26-迷宫寻路算法(Sample_algorithm)/",
+      "src": "/picture/src/old/202104261815347.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3g4MjQ4ODA1OQ==,size_16,color_FFFFFF,t_70#pic_center"
+    },
+    {
+      "page": "/20210513/deploy/2021-05-13-go语言rejson读取后Unmarshal乱码/",
+      "src": "/picture/src/old/20210513171405263.png#pic_center"
+    },
+    {
+      "page": "/20210513/deploy/2021-05-13-go语言rejson读取后Unmarshal乱码/",
+      "src": "/picture/src/old/20210513172143145.png#pic_center"
+    },
+    {
+      "page": "/20210513/deploy/2021-05-13-go语言rejson读取后Unmarshal乱码/",
+      "src": "/picture/src/old/20210513172710708.png#pic_center"
+    },
+    {
+      "page": "/20210513/deploy/2021-05-13-go语言rejson读取后Unmarshal乱码/",
+      "src": "/picture/src/old/20210513172805636.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3g4MjQ4ODA1OQ==,size_16,color_FFFFFF,t_70#pic_center"
+    },
+    {
+      "page": "/20210513/deploy/2021-05-13-go语言rejson读取后Unmarshal乱码/",
+      "src": "/picture/src/old/20210513173455659.png#pic_center"
+    },
+    {
+      "page": "/20220319/deploy/2022-03-19-c++调用C井的DLL/",
+      "src": "/picture/src/old/8f11e4c0618a464e94fecc02f7711ce2.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5piO5bm05Y2B5YWr5bKB,size_16,color_FFFFFF,t_70,g_se,x_16"
+    },
+    {
+      "page": "/20220319/deploy/2022-03-19-c++调用C井的DLL/",
+      "src": "/picture/src/old/ad0d809d53dc42ba859a39a4e6a7c057.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5piO5bm05Y2B5YWr5bKB,size_20,color_FFFFFF,t_70,g_se,x_16"
+    },
+    {
+      "page": "/20220319/deploy/2022-03-19-c++调用C井的DLL/",
+      "src": "/picture/src/old/303efd98b05949309f23fcd9ed45fc41.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5piO5bm05Y2B5YWr5bKB,size_20,color_FFFFFF,t_70,g_se,x_16"
+    },
+    {
+      "page": "/20220319/deploy/2022-03-19-c++调用C井的DLL/",
+      "src": "/picture/src/old/9b059aafaaf84f2e90717027f901b14d.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5piO5bm05Y2B5YWr5bKB,size_20,color_FFFFFF,t_70,g_se,x_16"
+    }
+  ],
+  "problem_pages": [
+    "/20191125/deploy/2019-11-25-视频转码后播放分辨率与转码分辨率不同/",
+    "/20200819/deploy/2020-08-19-Windows编译FreeRDP/",
+    "/20210407/deploy/2021-04-07-迷宫生成算法(Aldous-Broder_algorithm)/",
+    "/20210414/deploy/2021-04-14-迷宫寻路算法(深度优先搜索)/",
+    "/20210426/deploy/2021-04-26-迷宫寻路算法(Sample_algorithm)/",
+    "/20210513/deploy/2021-05-13-go语言rejson读取后Unmarshal乱码/",
+    "/20220319/deploy/2022-03-19-c++调用C井的DLL/"
+  ]
+}
